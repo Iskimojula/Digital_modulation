@@ -25,9 +25,16 @@
 % Lakshminarayanan,V. (ed) (Optical Society of America, Washington, DC 2000), pp: 232-244. 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+close all;
 clear all;
+addpath('D:\课题\数字调制疗法\maeda_sourcecode');
 
+% 获取当前日期和时间
+currentDateTime = datetime('now');
+% 设置自定义格式
+currentDateTime.Format = 'yyyy-MM-dd_HH_mm_ss';  % 年-月-日 时:分:秒
+% 转换为字符串
+dateTimeString = string(currentDateTime);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % Zernike polynomial selection
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -38,9 +45,9 @@ m=0                 %[INPUT] azimuthal frequency of the sinusoidal component
 j=0.5*(n*(n+2)+m)   %mode number (0 to 36) from single indexing scheme
 
 disp('Pupil Diameter (mm), RMS Wavefront Error (micron), and Wavelength (nm)')
-d=4;                     %[INPUT] pupil diameter in mm (3 to 8 mm)
+d=8;                     %[INPUT] pupil diameter in mm (3 to 8 mm)
 PupilDiameter=d
-Wrms=0.3                 %[INPUT] rms wavefront error coefficient in microns
+Wrms=0.2                 %[INPUT] rms wavefront error coefficient in microns
 lambda=570               %[INPUT] wavelength in nm
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,6 +87,14 @@ for I=1:Imax
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% image read and preprocess
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+imagePath = 'sample_rgb_653.jpg';
+type = 'rgb';
+img= (imread(imagePath));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compute Zernike polynomial
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -100,6 +115,20 @@ PSF=rot90(PSF);
 PSF0=flipud(PSF0);
 PSF=flipud(PSF);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% convolution
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+res = imageprocess(img,PSF,type);
+parastr = "para: "+"n= " + num2str(n) + ", m= " + num2str(m) + ", PupilDiameter= "...
+    + num2str(d) + ", Wrms= " + num2str(Wrms/1e-3) + ", lambda= " + num2str(lambda/1e-6) ...
+    + ", imgsize= "+ num2str(size(img,1)) + ", psfsize= " + num2str(size(PSF,1));
+
+text(800, 800, parastr, 'Color', 'black', 'FontSize', 8, 'HorizontalAlignment', 'right');
+
+resname = "psfconvres_" + dateTimeString + ".png";
+saveas(gcf,resname);
+if 0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot PSF
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -176,3 +205,5 @@ axis([vmin*1000 vmax*1000 0 1])
 axis square
 title(['PSF of Z ^{', num2str(m),'}_{', num2str(n),'} ,',...
        ' RMS Error = ', num2str(Wrms/lambda),'\lambda'],'FontSize', 10);
+
+end
