@@ -45,7 +45,7 @@ m=0                 %[INPUT] azimuthal frequency of the sinusoidal component
 j=0.5*(n*(n+2)+m)   %mode number (0 to 36) from single indexing scheme
 
 disp('Pupil Diameter (mm), RMS Wavefront Error (micron), and Wavelength (nm)')
-d=8;                     %[INPUT] pupil diameter in mm (3 to 8 mm)
+d=4;                     %[INPUT] pupil diameter in mm (3 to 8 mm)
 PupilDiameter=d
 Wrms=0.2                 %[INPUT] rms wavefront error coefficient in microns
 lambda=570               %[INPUT] wavelength in nm
@@ -68,8 +68,8 @@ xwmin=-25000;  %minimum x-coordinate in number of wavelengths
 xwmax=25000;   %maximum x-coordinate in number of wavelengths
 ywmin=-25000;  %minimum y-coordinate in number of wavelengths
 ywmax=25000;   %maximum y-coordinate in number of wavelengths
-dxw=2000;       %x-coordinate pixel width in number of wavelengths
-dyw=2000;       %y-coordinate pixel width in number of wavelengths
+dxw=2500;       %x-coordinate pixel width in number of wavelengths
+dyw=2500;       %y-coordinate pixel width in number of wavelengths
 
 xw=xwmin:dxw:xwmax;   %x-coordinates in number of wavelengths
 yw=ywmin:dyw:ywmax;   %y-coordinates in number of wavelengths

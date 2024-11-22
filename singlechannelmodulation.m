@@ -19,9 +19,7 @@ function [resimg_double,resimg_uint8] = singlechannelmodulation(singlechannel,PS
     % 将卷积结果与原图像结合
     resimg_double = double(uchannel) .* mask + double(singlechannel) .* (1 - mask);
 
-    % 使用 mat2gray 将图像缩放到 [0, 1]
-    normalizedImage = mat2gray(resimg_double);
+    resimg_double(resimg_double>=255) = 255;
     
-    % 将 normalizedImage 转换为 uint8 类型
-    resimg_uint8 = uint8(normalizedImage * 255); % 线性缩放到 0-255 范围
+    resimg_uint8 = uint8(resimg_double); % 线性缩放到 0-255 范围
 end
