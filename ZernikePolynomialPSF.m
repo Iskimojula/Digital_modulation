@@ -40,7 +40,7 @@ dateTimeString = string(currentDateTime);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 disp('Zernike Polynomial radial order n, azimuthal frequency m, and mode number j')
-n=2               %[INPUT] highest power or order of the radial polynomial term
+n=2                 %[INPUT] highest power or order of the radial polynomial term
 m=0                 %[INPUT] azimuthal frequency of the sinusoidal component
 j=0.5*(n*(n+2)+m)   %mode number (0 to 36) from single indexing scheme
 
@@ -68,8 +68,8 @@ xwmin=-25000;  %minimum x-coordinate in number of wavelengths
 xwmax=25000;   %maximum x-coordinate in number of wavelengths
 ywmin=-25000;  %minimum y-coordinate in number of wavelengths
 ywmax=25000;   %maximum y-coordinate in number of wavelengths
-dxw=250;       %x-coordinate pixel width in number of wavelengths
-dyw=250;       %y-coordinate pixel width in number of wavelengths
+dxw=2000;       %x-coordinate pixel width in number of wavelengths
+dyw=2000;       %y-coordinate pixel width in number of wavelengths
 
 xw=xwmin:dxw:xwmax;   %x-coordinates in number of wavelengths
 yw=ywmin:dyw:ywmax;   %y-coordinates in number of wavelengths
