@@ -40,8 +40,8 @@ dateTimeString = string(currentDateTime);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 disp('Zernike Polynomial radial order n, azimuthal frequency m, and mode number j')
-n=2                 %[INPUT] highest power or order of the radial polynomial term
-m=0                 %[INPUT] azimuthal frequency of the sinusoidal component
+n=3                 %[INPUT] highest power or order of the radial polynomial term
+m=-1                 %[INPUT] azimuthal frequency of the sinusoidal component
 j=0.5*(n*(n+2)+m)   %mode number (0 to 36) from single indexing scheme
 
 disp('Pupil Diameter (mm), RMS Wavefront Error (micron), and Wavelength (nm)')

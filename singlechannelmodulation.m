@@ -1,4 +1,4 @@
-function [resimg_double,resimg_uint8] = singlechannelmodulation(singlechannel,PSF,centerrow,centercol,maskradius,transition_width)
+function [resimg_double,resimg_uint8,resimg_nomask] = singlechannelmodulation(singlechannel,PSF,centerrow,centercol,maskradius,transition_width)
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
     [~,uchannel] = singlechannelprocess(singlechannel,PSF);
@@ -16,6 +16,7 @@ function [resimg_double,resimg_uint8] = singlechannelmodulation(singlechannel,PS
         end
      end
     
+    resimg_nomask = uchannel;
     % 将卷积结果与原图像结合
     resimg_double = double(uchannel) .* mask + double(singlechannel) .* (1 - mask);
 

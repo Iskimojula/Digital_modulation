@@ -26,6 +26,15 @@
 
 clear all;
 
+close all;
+addpath('D:\课题\数字调制疗法\maeda_sourcecode');
+
+% 获取当前日期和时间
+currentDateTime = datetime('now');
+% 设置自定义格式
+currentDateTime.Format = 'yyyy-MM-dd_HH_mm_ss';  % 年-月-日 时:分:秒
+% 转换为字符串
+dateTimeString = string(currentDateTime);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Wave Aberration definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,9 +44,24 @@ jmax=14                  %[INPUT] highest mode number from single indexing schem
 
 disp('Pupil Diameter (mm), RMS Wave Aberration Coefficients (micron), and Wavelength (nm)')
 d=5.4;                   %[INPUT] pupil diameter in mm (3 to 8 mm)
-PupilDiameter=d
-Wrmsj=[0 0 0 0.4164 0 0.135 0.074 -0.092 0.011...  %[INPUT] rms wavefront error coefficient in microns
-       -0.12 -0.038 0.016 0.085 -0.06 0.047]'
+PupilDiameter=d;
+% Wrmsj=[0 0 0 0.4164 0 0.135 0.074 -0.092 0.011...  %[INPUT] rms wavefront error coefficient in microns
+%        -0.12 -0.038 0.016 0.085 -0.06 0.047]'
+Wrmsj=[0 ...  %j = 0 , n = 0 , m = 0
+       0 ...  %j = 1 , n = 1 , m = -1
+       0 ...  %j = 2 , n = 1,  m = 1
+       0 ...  %j = 3 , n = 2,  m = -2  Astigmatism
+       0 ...  %j = 4 , n = 2,  m = 0   defocus
+       0 ...  %j = 5 , n = 2,  m = 2    Astigmatism
+       0 ...  %j = 6 , n = 3,  m = -3   Trefoil
+       0 ...  %j = 7 , n = 3,  m = -1   Coma
+       0 ...  %j = 8 , n = 3,  m = 1    Coma
+       0 ...  %j = 9 , n = 3,  m = 3    Trefoil
+       0 ...  %j = 10 , n = 4,  m = -4
+       0 ...  %j = 11 , n = 4,  m = -2
+       0 ...  %j = 12 , n = 4,  m = 0   Spherical Aberration 
+       0 ...  %j = 13 , n = 4,  m = 2
+       0]'    %j = 14 , n = 4,  m = 4
 Wrmst=0;
 for j=0:jmax
    Wrmst=Wrmst+Wrmsj(j+1)^2;
@@ -92,6 +116,7 @@ for j=0:jmax
    n=ceil((-3+sqrt(9+8*j))/2);   %highest power or order of the radial polynomial term
    m=2*j-n*(n+2);                %azimuthal frequency of the sinusoidal component
    W=W+Wrmsj(j+1)*zernike(n,m,xw,yw,dw);
+   disp([j,n,m]);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -110,6 +135,27 @@ PSF0=flipud(PSF0);
 PSF=flipud(PSF);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% image read and preprocess
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+imagePath = 'sample_rgb_653.jpg';
+type = 'rgb';
+img= (imread(imagePath));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% convolution
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+res = imageprocess(img,PSF,type);
+
+parastr = "para: "+ " PupilDiameter= "...
+    + num2str(d) + ", Wrms= " + num2str(Wrmstotal/1e-3) + ", lambda= " + num2str(lambda/1e-6) ...
+    + ", imgsize= "+ num2str(size(img,1)) + ", psfsize= " + num2str(size(PSF,1));
+text(100, 700, parastr, 'Color', 'black', 'FontSize', 8, 'HorizontalAlignment', 'right');
+
+Wrmsstr = num2str((Wrmsj*1e3)');
+text(-1100, 800, "Wrmsj : "+ Wrmsstr, 'Color', 'black', 'FontSize', 8, 'HorizontalAlignment', 'left');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot PSF
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -122,8 +168,8 @@ dv=0.00002;     %thetay-coordinate pixel width in radians
 u=umin:du:umax;   %thetax-coordinates in radians
 v=vmin:dv:vmax;   %thetay-coordinates in radians
 
-figure
-subplot(2,1,1)
+% figure
+subplot(2,3,4)
 scale=(2)^7/max(max(PSF0));
 image(u*1000,v*1000,PSF0*scale)  %scaled for saturated display of image
 %imagesc(u*1000,v*1000,PSF0)
@@ -137,7 +183,7 @@ title(['PSF of Zero Aberration System, Pupil Diameter = ',...
 colormap gray
 
 %figure
-subplot(2,1,2)
+subplot(2,3,5)
 scale=(2)^7/max(max(PSF));
 image(u*1000,v*1000,PSF*scale)   %scaled for saturated display of image
 %imagesc(u*1000,v*1000,PSF)
@@ -150,9 +196,16 @@ title(['PSF of Aberrated System, RMS Wavefront Error = ',num2str(Wrmstotal/lambd
 colormap gray
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% Plot PSF Cross-sections
+% figure out
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+resname = "aberrations_" + dateTimeString + ".png";
+saveas(gcf,resname);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% Plot PSF Cross-sections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0
 figure
 subplot(2,2,1)
 plot(u*1000, PSF0((Imax+1)/2,:)/max(max(PSF0)))
@@ -184,3 +237,4 @@ ylabel('Normalized Amplitude')
 axis([vmin*1000 vmax*1000 0 1])
 axis square
 title(['PSF of Aberrated System, Wrms = ', num2str(Wrmstotal/lambda),'\lambda'],'FontSize', 10);
+end
